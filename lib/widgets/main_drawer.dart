@@ -34,7 +34,7 @@ class _MainDrawerState extends State<MainDrawer> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(55),
-                  child: Image.asset('assets/images/Next_Digit-Logo.png',
+                  child: Image.asset('assets/images/user.jpg',
                       height: 110, width: 110, fit: BoxFit.cover),
 
               //     AuthService.user!.photoURL == null ? Image.asset('assets/images/male.png',
@@ -44,7 +44,7 @@ class _MainDrawerState extends State<MainDrawer> {
                 ),
                 const SizedBox(height: 10,),
                 //AuthService.user!.email!
-                const Text("nextdigitpro@gmail.com",
+                const Text("Snow Star",
                   style: TextStyle(fontSize: 16,color: Colors.white),),
               ],
             ),
