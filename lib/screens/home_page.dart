@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gpt/screens/voice_chat.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
+import '../constants/constants.dart';
 import '../widgets/main_drawer.dart';
 import 'chat_screen.dart';
 import 'image_generator.dart';
@@ -8,13 +10,25 @@ import 'image_generator.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  SpeechToText speechToText = SpeechToText();
+
+  initSTT() async {
+    available = await speechToText.initialize();
+  }
+
+  @override
+  void initState() {
+    initSTT();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
 

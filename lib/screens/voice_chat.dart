@@ -3,6 +3,7 @@ import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
+import '../constants/constants.dart';
 import '../models/chat_model.dart';
 import '../services/api_service.dart';
 import '../services/tts_functions.dart';
@@ -35,8 +36,6 @@ class _VoiceChatBotState extends State<VoiceChatBot> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const MainDrawer(),
-      //backgroundColor: const Color(0xFFCCCCFF),
-      //floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: DraggableFab(
         child: AvatarGlow(
           glowColor: const Color(0xFFFF007F),
@@ -47,52 +46,55 @@ class _VoiceChatBotState extends State<VoiceChatBot> {
           repeat: true,
           startDelay: const Duration(milliseconds: 100),
           child: GestureDetector(
-            onTapDown: (details) async {
-              print('======');
+            onTap: () async {
+              print('===on Tap Down===');
+              if(!available) {
+                var a = await speechToText.initialize();
+                setState(() {
+                  available = a;
+                });
+              }
               if (!isListening) {
                 text = "Listening...";
-                var available = await speechToText.initialize();
+                print('---------------available----$available');
                 if (available) {
                   setState(() {
                     isListening = true;
-                    speechToText.listen(onResult: (result) {
-                      setState(() {
-                        text = result.recognizedWords;
-                        print("============> $text");
-                      });
+                  });
+                  print('---------------isListening----$isListening');
+                  speechToText.listen(onResult: (result) {
+                    setState(() {
+                      text = result.recognizedWords;
+                      print("============> $text");
                     });
                   });
                 }
-              }
-            },
-            onTapUp: (details) async {
-              setState(() {
-                isListening = false;
-              });
-              await speechToText.stop();
-
-              if(text.isEmpty && text != "Hold the button and start speaking..." && text != "Listening...") {
-                messages.add(ChatMessage(text: text, type: ChatMessageType.user));
-                print("<<<----Your Voice---->>>: $text");
-                var msg = await ApiServices.sendMessage(text);
-                msg = msg.trim();
-
-                setState(() {
-                  messages.add(ChatMessage(text: msg, type: ChatMessageType.bot));
-                });
-
-                Future.delayed(const Duration(milliseconds: 500),(){
-                  TextToSpeech.speak(msg);
-                });
-
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
+                setState(() {
+                  isListening = false;
+                });
+                await speechToText.stop();
+                if(text.isEmpty && text != "Hold the button and start speaking..." && text != "Listening...") {
+                  messages.add(ChatMessage(text: text, type: ChatMessageType.user));
+                  print("<<<----Your Voice---->>>: $text");
+                  var msg = await ApiServices.sendMessage(text);
+                  msg = msg.trim();
+
+                  setState(() {
+                    messages.add(ChatMessage(text: msg, type: ChatMessageType.bot));
+                  });
+
+                  Future.delayed(const Duration(milliseconds: 500),(){
+                    TextToSpeech.speak(msg);
+                  });
+
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content: Text("Failed to process. Try again!")),
-                );
+                  );
+                }
               }
-
-
             },
             child: CircleAvatar(
               backgroundColor: const Color(0xFFF52887),
