@@ -18,23 +18,29 @@ class ApiServices {
   };
 
   static sendMessage(String? message) async {
-    var res = await http.post(Uri.parse(baseUrl),
-        headers: header,
-        body: jsonEncode({
-          "model": "text-davinci-003",
-          "prompt": '$message',
-          "max_tokens": 100,
-          "temperature": 0,
-          "top_p": 1,
-          "frequency_penalty": 0.0,
-          "presence_penalty": 0.0,
-          "stop": ["Human:", " AI:"]
-        })
+    var response = await http.post(
+      Uri.parse("$BASE_URL/chat/completions"),
+      headers: {
+        'Authorization': 'Bearer $API_KEY',
+        "Content-Type": "application/json"
+      },
+      body: jsonEncode(
+        {
+          "model": 'gpt-3.5-turbo',
+          "messages": [
+            {
+              "role": "user",
+              "content": message,
+            }
+          ]
+        },
+      ),
     );
+    if(response.statusCode == 200) {
+      var data = jsonDecode(response.body.toString());
 
-    if(res.statusCode == 200) {
-      var data = jsonDecode(res.body.toString());
-      var msg = data['choices'][0]['text'];
+      var msg = data['choices'][0]['message']['content'];
+
       return msg;
     } else {
       print("Failed to fetch data");

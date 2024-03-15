@@ -47,7 +47,6 @@ class _VoiceChatBotState extends State<VoiceChatBot> {
           startDelay: const Duration(milliseconds: 100),
           child: GestureDetector(
             onTap: () async {
-              print('===on Tap Down===');
               if(!available) {
                 var a = await speechToText.initialize();
                 setState(() {
@@ -63,6 +62,7 @@ class _VoiceChatBotState extends State<VoiceChatBot> {
                   });
                   print('---------------isListening----$isListening');
                   speechToText.listen(onResult: (result) {
+                    print("============> $text");
                     setState(() {
                       text = result.recognizedWords;
                       print("============> $text");
@@ -74,10 +74,11 @@ class _VoiceChatBotState extends State<VoiceChatBot> {
                   isListening = false;
                 });
                 await speechToText.stop();
-                if(text.isEmpty && text != "Hold the button and start speaking..." && text != "Listening...") {
+                if(text.isNotEmpty && text != "Hold the button and start speaking..." && text != "Listening...") {
                   messages.add(ChatMessage(text: text, type: ChatMessageType.user));
                   print("<<<----Your Voice---->>>: $text");
                   var msg = await ApiServices.sendMessage(text);
+
                   msg = msg.trim();
 
                   setState(() {
@@ -89,6 +90,9 @@ class _VoiceChatBotState extends State<VoiceChatBot> {
                   });
 
                 } else {
+                  setState(() {
+                    text = 'Hold the button and start speaking...';
+                  });
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content: Text("Failed to process. Try again!")),
